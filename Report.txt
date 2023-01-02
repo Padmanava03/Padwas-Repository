@@ -1,0 +1,3 @@
+                           REPORT CARD    
++--------------+--------------------------------+-----+-----+--------+
+|  STUDENT ID  |           STUDENT NAME         |MARKS|GRADE| RESULT |
