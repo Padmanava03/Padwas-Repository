@@ -15,7 +15,6 @@ def module():
     return a
 def report(a,x,m):
     f=open("Report.txt","a")
-    f.write('+--------------+--------------------------------+-----+-----+--------+\n')
     f.write('|')
     f.write(a)
     f.write(' '*(14-len(a)))
@@ -44,6 +43,7 @@ def report(a,x,m):
     else:
         f.write('  F  |')
         f.write(' FAILED |\n')
+    f.write('+--------------+--------------------------------+-----+-----+--------+\n')
     f.close()
 def delfile(k):
     z=open("Report.txt","r")
@@ -56,7 +56,7 @@ def delfile(k):
     i=1
     z=open("Report.txt","w")
     for j in x:
-        if i!=l:
+        if i!=l+1:
             z.write(j)
             i+=1
     z.seek(0)
@@ -73,7 +73,7 @@ def student(mycur):
     if(a==1):
         n=int(input("How many student you want to enter?..."))
         for i in range(1,n+1):
-            print('Student entry',i,':')
+            print('**Student entry:',i,'**')
             st_id=int(input("ID: "))
             st_name=input("Name: ")
             st_roll=int(input("Roll number: "))
@@ -124,7 +124,7 @@ def student(mycur):
                                 try:
                                     mycur.execute(query)
                                     con.commit()
-                                    print("Details updated successfully.....")
+                                    print("Details of",st_id,"updated successfully.....")
                                 except:
                                     con.rollback()
             else:
@@ -147,7 +147,7 @@ def student(mycur):
                                 try:
                                     mycur.execute(query)
                                     con.commit()
-                                    print("Details updated successfully.....")
+                                    print("Details of",st_id,"updated successfully.....")
                                 except:
                                     con.rollback()
     elif(a==3):
@@ -177,7 +177,7 @@ def student(mycur):
                             try:
                                 mycur.execute(query)
                                 con.commit()
-                                print("Details deleted successfully.....")
+                                print("Details of",st_id,"deleted successfully.....")
                                 delfile(str(st_id))
                             except:
                                 con.rollback()
@@ -192,8 +192,6 @@ def student(mycur):
         if(f==0):
             print('There is no data to generate a report card.....')
         else:
-            z=open("Report.txt","a")
-            z.write('+--------------+--------------------------------+-----+-----+--------+\n')
             z=open("Report.txt","r")
             print(z.read())
         z.close()
@@ -232,6 +230,7 @@ def eng(mycurr,i,n,r,m):
         con.commit()
     except:
         con.rollback()
+        print("The following student ID",i,"was already enrolled.....")
 def course_stats(mycurr):
     mycurr.execute("Select * from python")
     data=mycurr.fetchall()
@@ -289,6 +288,7 @@ def course_stcs(mycurr):
     else:
         id=[]
         Marks=[]
+        marks=[]
         Grades=[]
         query="Select * from python"
         mycurr.execute(query)
@@ -296,24 +296,30 @@ def course_stcs(mycurr):
         for i in data:
             id.append(i[0])
         for i in range(0,len(id)):
-            query="Select(select SUM(marks) FROM python WHERE std_id=('{}'))+(select SUM(marks) FROM physics WHERE std_id=('{}'))+(select SUM(marks) FROM chem WHERE std_id=('{}'))+(select SUM(marks) FROM maths WHERE std_id=('{}'))+(select SUM(marks) FROM eng WHERE std_id=('{}')) as RESULT".format(id[i],id[i],id[i],id[i],id[i])
+            query="Select(select SUM(marks) FROM python WHERE std_id='{}')+(select SUM(marks) FROM physics WHERE std_id='{}')+(select SUM(marks) FROM chem WHERE std_id='{}')+(select SUM(marks) FROM maths WHERE std_id='{}')+(select SUM(marks) FROM eng WHERE std_id='{}') as RESULT".format(id[i],id[i],id[i],id[i],id[i])
             mycurr.execute(query)
             data=mycurr.fetchall()
             for j in data:
                 Marks.append(j[0]//5)
         for i in range(0,len(Marks)):
-            if(Marks[i]>=90 or Marks[i]<=100):
+            f=Marks[i]
+            h=int(f)
+            marks.append(h)
+        for i in range(0,len(marks)):
+            if(marks[i]>=90 and marks[i]<=100):
                 Grades.append('A')
-            elif(Marks[i]>=80 or Marks[i]<90):
+            elif(marks[i]>=80 and marks[i]<90):
                 Grades.append('B')
-            elif(Marks[i]>=70 or Marks[i]<80):
+            elif(marks[i]>=70 and marks[i]<80):
                 Grades.append('C')
-            elif(Marks[i]>=60 or Marks[i]<70):
+            elif(marks[i]>=60 and marks[i]<70):
                 Grades.append('D')
-            elif(Marks[i]>=50 or Marks[i]<=60):
+            elif(marks[i]>=50 and marks[i]<=60):
                 Grades.append('E')
             else:
                 Grades.append('F')
+        Grades.sort()
+        k=['A','B','C','D','E','F']
         g=np.array(Grades)
         # Creating histogram
         fig, axs = plt.subplots(1, 1,figsize =(5,6),tight_layout = True)
@@ -329,7 +335,7 @@ def course_stcs(mycurr):
         # Add text watermark
         fig.text(0.9, 0.15, 'F-39 Padmanava Biswas',fontsize = 12,color ='red',ha ='right',va ='bottom',alpha = 0.7)
         # Creating histogram
-        N,bins,patches=axs.hist(g,bins=['A','B','C','D','E','F'])
+        N,bins,patches=axs.hist(g,bins=len(k))
         # Setting color
         fracs=((N**(1 / 5)) / N.max())
         norm=colors.Normalize(fracs.min(), fracs.max())
@@ -353,6 +359,7 @@ def course(mycur):
         else:
             n=int(input('How many students you want to enroll in the courses?...'))
             for k in range(n):
+                print('**Entry:',k+1,'**')
                 st_id=int(input('Student ID: '))
                 mycur.execute("Select stu_id from student where stu_id='{}'".format(st_id))
                 d=mycur.fetchall()
