@@ -15,7 +15,6 @@ def module():
     return a
 def report(a,x,m):
     f=open("Report.txt","a")
-    f.write('+--------------+--------------------------------+-----+-----+--------+\n')
     f.write('|')
     f.write(a)
     f.write(' '*(14-len(a)))
@@ -44,6 +43,7 @@ def report(a,x,m):
     else:
         f.write('  F  |')
         f.write(' FAILED |\n')
+    f.write('+--------------+--------------------------------+-----+-----+--------+\n')
     f.close()
 def delfile(k):
     z=open("Report.txt","r")
@@ -56,7 +56,7 @@ def delfile(k):
     i=1
     z=open("Report.txt","w")
     for j in x:
-        if i!=l:
+        if i!=l+1:
             z.write(j)
             i+=1
     z.seek(0)
@@ -192,8 +192,6 @@ def student(mycur):
         if(f==0):
             print('There is no data to generate a report card.....')
         else:
-            z=open("Report.txt","a")
-            z.write('+--------------+--------------------------------+-----+-----+--------+\n')
             z=open("Report.txt","r")
             print(z.read())
         z.close()
@@ -232,6 +230,7 @@ def eng(mycurr,i,n,r,m):
         con.commit()
     except:
         con.rollback()
+        print("The following student ID",i,"was already enrolled.....")
 def course_stats(mycurr):
     mycurr.execute("Select * from python")
     data=mycurr.fetchall()
